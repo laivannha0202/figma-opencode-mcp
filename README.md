@@ -4,6 +4,8 @@
 
 > No Figma API token required. No Figma REST API in default mode. All communication stays on your machine.
 
+**Version: v0.1.1** — Hardening release. Improved security, verify script, font handling, and CI.
+
 ## Key Features
 
 - 🔌 **No Figma API token required** in default mode
@@ -55,10 +57,12 @@ node dist/index.js
 ### 3. Configure OpenCode/Codex
 
 Add the MCP config to your tool. See:
+
 - [OpenCode setup](docs/setup-opencode.md)
 - [Codex setup](docs/setup-codex.md)
 
 Example config:
+
 ```json
 {
   "mcpServers": {
@@ -81,16 +85,16 @@ Example config:
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `figma_ping` | Check connection status |
-| `figma_get_selection` | Get selected nodes |
-| `figma_get_current_page` | Get current page info |
-| `figma_get_node_tree` | Get node tree |
+| Tool                          | Description               |
+| ----------------------------- | ------------------------- |
+| `figma_ping`                  | Check connection status   |
+| `figma_get_selection`         | Get selected nodes        |
+| `figma_get_current_page`      | Get current page info     |
+| `figma_get_node_tree`         | Get node tree             |
 | `figma_export_selection_json` | Export as structured JSON |
-| `figma_create_frame` | Create a frame |
-| `figma_create_text` | Create a text node |
-| `figma_audit_selection` | Audit for design issues |
+| `figma_create_frame`          | Create a frame            |
+| `figma_create_text`           | Create a text node        |
+| `figma_audit_selection`       | Audit for design issues   |
 
 See [docs/tools.md](docs/tools.md) for detailed documentation.
 
@@ -132,6 +136,7 @@ See [docs/security.md](docs/security.md).
 ## Roadmap
 
 ### v0.2.0
+
 - `figma_extract_design_tokens`
 - `figma_generate_react_spec`
 - `figma_compare_code_with_design`
@@ -140,6 +145,7 @@ See [docs/security.md](docs/security.md).
 - `figma_export_svg_png`
 
 ### v0.3.0
+
 - Integration profile for `opencode-power-kit`
 - `/figma-setup` slash command
 - `/figma-to-react` workflow
@@ -147,6 +153,7 @@ See [docs/security.md](docs/security.md).
 - `figma-design-system` skill
 
 ### v1.0.0
+
 - Stable no-token local bridge
 - Better plugin session management
 - Better schema docs

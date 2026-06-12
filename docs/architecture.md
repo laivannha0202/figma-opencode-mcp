@@ -45,6 +45,7 @@ The key design principle is **no Figma API token required** in default mode. All
 ## Why stdio for MCP?
 
 MCP supports stdio transport natively. It's the simplest, most reliable way for local tools:
+
 - No HTTP server to manage
 - No port conflicts for the MCP channel
 - Direct process communication
@@ -53,6 +54,7 @@ MCP supports stdio transport natively. It's the simplest, most reliable way for 
 ## Why WebSocket for the plugin bridge?
 
 The Figma plugin runs in a sandboxed environment inside Figma (or a browser). It cannot:
+
 - Create a TCP server
 - Listen on a port
 - Use Unix sockets
@@ -62,6 +64,7 @@ However, the plugin **UI** can initiate a WebSocket connection to a local server
 ## Why plugin UI handles WebSocket, not plugin main code?
 
 Figma plugin architecture:
+
 - **Plugin main code** (`code.ts`): Full access to Figma Plugin API but **no network access**
 - **Plugin UI** (`ui.html`): Runs in a sandboxed iframe, has limited network access (WebSocket to localhost)
 

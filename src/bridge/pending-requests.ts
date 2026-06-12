@@ -29,10 +29,7 @@ export class PendingRequests {
    * Register a pending request.
    * Returns the request_id for use in the bridge message.
    */
-  register(
-    tool: string,
-    timeoutMs?: number,
-  ): { requestId: string; promise: Promise<unknown> } {
+  register(tool: string, timeoutMs?: number): { requestId: string; promise: Promise<unknown> } {
     const requestId = crypto.randomUUID();
     const timeout = timeoutMs ?? this._defaultTimeoutMs;
 
@@ -47,11 +44,7 @@ export class PendingRequests {
     const timeoutHandle = setTimeout(() => {
       if (this._map.has(requestId)) {
         this._map.delete(requestId);
-        reject(
-          new Error(
-            `Bridge request "${tool}" timed out after ${timeout}ms`,
-          ),
-        );
+        reject(new Error(`Bridge request "${tool}" timed out after ${timeout}ms`));
         logger.warn(`Request ${requestId} ("${tool}") timed out`);
       }
     }, timeout);
@@ -87,9 +80,7 @@ export class PendingRequests {
    */
   rejectAll(reason: string): void {
     if (this._map.size === 0) return;
-    logger.warn(
-      `Rejecting ${this._map.size} pending request(s): ${reason}`,
-    );
+    logger.warn(`Rejecting ${this._map.size} pending request(s): ${reason}`);
     for (const [id, entry] of this._map.entries()) {
       clearTimeout(entry.timeout);
       entry.reject(new Error(reason));

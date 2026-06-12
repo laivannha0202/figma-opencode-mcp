@@ -4,23 +4,34 @@ set -euo pipefail
 # figma-opencode-mcp — Verify build, typecheck, and file existence
 cd "$(dirname "$0")/.."
 
-echo "=== figma-opencode-mcp verify ===
-"
+echo "=== figma-opencode-mcp verify ==="
+echo ""
+
+FAILED=0
 
 # 1. TypeScript typecheck
 echo "--- TypeScript typecheck ---"
-npm run typecheck 2>&1 || echo "⚠️  Typecheck had errors (see above)"
+if ! npm run typecheck 2>&1; then
+  echo "❌ Typecheck failed"
+  FAILED=1
+fi
 echo ""
 
 # 2. Build MCP server
 echo "--- Build MCP server ---"
-npm run build 2>&1 || echo "⚠️  Build had errors (see above)"
+if ! npm run build 2>&1; then
+  echo "❌ Build failed"
+  FAILED=1
+fi
 echo ""
 
 # 3. Build plugin (if config exists)
 if [ -f "plugin/tsconfig.json" ]; then
   echo "--- Build Figma plugin ---"
-  npm run build:plugin 2>&1 || echo "⚠️  Plugin build had errors (see above)"
+  if ! npm run build:plugin 2>&1; then
+    echo "❌ Plugin build failed"
+    FAILED=1
+  fi
   echo ""
 fi
 
@@ -56,6 +67,7 @@ for f in \
   else
     echo "❌ $f — MISSING"
     MISSING=$((MISSING+1))
+    FAILED=1
   fi
 done
 
@@ -63,8 +75,14 @@ echo ""
 if [ "$MISSING" -eq 0 ]; then
   echo "✅ All required files present"
 else
-  echo "⚠️  $MISSING file(s) missing"
+  echo "❌ $MISSING file(s) missing"
 fi
 
 echo ""
-echo "=== Verify complete ==="
+if [ "$FAILED" -eq 0 ]; then
+  echo "=== Verify passed ==="
+  exit 0
+else
+  echo "=== Verify FAILED ==="
+  exit 1
+fi

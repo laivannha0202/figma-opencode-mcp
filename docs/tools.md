@@ -11,6 +11,7 @@ All tools are available once the MCP server is running and the Figma plugin is c
 **Input:** None
 
 **Output:**
+
 ```json
 {
   "ok": true,
@@ -25,9 +26,11 @@ All tools are available once the MCP server is running and the Figma plugin is c
 ```
 
 **Errors:**
+
 - If plugin not connected: `ok: false` with descriptive message.
 
 **Example usage:**
+
 ```
 Check if Figma is connected with figma_ping.
 ```
@@ -39,10 +42,12 @@ Check if Figma is connected with figma_ping.
 **Purpose:** Get the list of currently selected nodes in the active Figma file.
 
 **Input:**
+
 - `includeChildren` (boolean, optional): Include children recursively.
 - `maxDepth` (number, optional): Max depth for children (1-10, default: 3).
 
 **Output:**
+
 ```json
 {
   "selection": [
@@ -64,6 +69,7 @@ Check if Figma is connected with figma_ping.
 ```
 
 **Example usage:**
+
 ```
 Call figma_get_selection to see what I have selected.
 ```
@@ -77,18 +83,18 @@ Call figma_get_selection to see what I have selected.
 **Input:** None
 
 **Output:**
+
 ```json
 {
   "id": "0:0",
   "name": "Page 1",
   "childCount": 5,
-  "topLevelNodes": [
-    { "id": "1:2", "name": "Frame 1", "type": "FRAME" }
-  ]
+  "topLevelNodes": [{ "id": "1:2", "name": "Frame 1", "type": "FRAME" }]
 }
 ```
 
 **Example usage:**
+
 ```
 What page am I on? Use figma_get_current_page.
 ```
@@ -100,6 +106,7 @@ What page am I on? Use figma_get_current_page.
 **Purpose:** Get the node tree starting from the current page or a specific node.
 
 **Input:**
+
 - `nodeId` (string, optional): Node ID to start from (default: current page).
 - `maxDepth` (number, optional): Max depth (1-10, default: 5).
 - `includeInvisible` (boolean, optional): Include invisible nodes.
@@ -107,6 +114,7 @@ What page am I on? Use figma_get_current_page.
 **Output:** Recursive tree of serialized nodes.
 
 **Example usage:**
+
 ```
 Show me the node tree of my current page with figma_get_node_tree.
 ```
@@ -118,6 +126,7 @@ Show me the node tree of my current page with figma_get_node_tree.
 **Purpose:** Export the current selection as structured JSON, optimized for design-to-code workflows.
 
 **Input:**
+
 - `includeStyle` (boolean, optional): Include style properties (default: true).
 - `includeLayout` (boolean, optional): Include layout properties (default: true).
 - `includeChildren` (boolean, optional): Include children (default: true).
@@ -126,6 +135,7 @@ Show me the node tree of my current page with figma_get_node_tree.
 **Output:** Detailed JSON with geometry, layout, typography, colors, spacing, auto layout info.
 
 **Example usage:**
+
 ```
 Export my selection as JSON with figma_export_selection_json and generate a React component.
 ```
@@ -137,6 +147,7 @@ Export my selection as JSON with figma_export_selection_json and generate a Reac
 **Purpose:** Create a new frame node in the current page.
 
 **Input:**
+
 - `name` (string, required): Frame name.
 - `x` (number, optional): X position (default: 0).
 - `y` (number, optional): Y position (default: 0).
@@ -146,6 +157,7 @@ Export my selection as JSON with figma_export_selection_json and generate a Reac
 - `cornerRadius` (number, optional): Corner radius.
 
 **Output:**
+
 ```json
 {
   "id": "100:1",
@@ -159,9 +171,11 @@ Export my selection as JSON with figma_export_selection_json and generate a Reac
 ```
 
 **Errors:**
+
 - `INVALID_PARAMS` if width/height <= 0 or fill is not valid hex.
 
 **Example usage:**
+
 ```
 Create a frame named "Hero" that is 1440x800 with a blue background #1a1a2e.
 ```
@@ -173,6 +187,7 @@ Create a frame named "Hero" that is 1440x800 with a blue background #1a1a2e.
 **Purpose:** Create a new text node in the current page.
 
 **Input:**
+
 - `text` (string, required): Text content.
 - `name` (string, optional): Node name (default: first 40 chars of text).
 - `x` (number, optional): X position (default: 0).
@@ -181,6 +196,7 @@ Create a frame named "Hero" that is 1440x800 with a blue background #1a1a2e.
 - `fill` (string, optional): Hex text color `#RRGGBB`.
 
 **Output:**
+
 ```json
 {
   "id": "100:2",
@@ -194,9 +210,11 @@ Create a frame named "Hero" that is 1440x800 with a blue background #1a1a2e.
 ```
 
 **Errors:**
+
 - If default fonts cannot be loaded.
 
 **Example usage:**
+
 ```
 Add a heading "Welcome" in bold 48px at position 100, 100.
 ```
@@ -208,6 +226,7 @@ Add a heading "Welcome" in bold 48px at position 100, 100.
 **Purpose:** Audit the current selection for design system issues.
 
 **Input:**
+
 - `checkSpacing` (boolean, optional): Check spacing issues.
 - `checkColors` (boolean, optional): Check color consistency.
 - `checkTypography` (boolean, optional): Check typography issues.
@@ -215,6 +234,7 @@ Add a heading "Welcome" in bold 48px at position 100, 100.
 - `checkAccessibility` (boolean, optional): Check accessibility.
 
 **Output:**
+
 ```json
 {
   "summary": "Audited 3 node(s): 4 issue(s) found (0 error(s), 2 warning(s), 2 info).",
@@ -235,6 +255,7 @@ Add a heading "Welcome" in bold 48px at position 100, 100.
 ```
 
 **Example usage:**
+
 ```
 Audit my selection for design system issues with figma_audit_selection.
 ```

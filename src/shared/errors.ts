@@ -70,8 +70,5 @@ export function internalError(message: string, details?: unknown): McpError {
 }
 
 export function unsupportedToolError(tool: string): McpError {
-  return new McpError(
-    "UNSUPPORTED_TOOL",
-    `Tool "${tool}" is not supported in this version.`,
-  );
+  return new McpError("UNSUPPORTED_TOOL", `Tool "${tool}" is not supported in this version.`);
 }

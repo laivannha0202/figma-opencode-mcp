@@ -35,8 +35,9 @@
 
 ## Supply Chain
 
-- All dependencies are pinned via `package.json`.
-- Only required dependencies: `@modelcontextprotocol/sdk`, `zod`, `ws`.
+- Dependencies are locked via `package-lock.json` (commit it to repo).
+- Semver ranges in `package.json` are pinned to exact versions by the lockfile.
+- Only required runtime dependencies: `@modelcontextprotocol/sdk`, `zod`, `ws`.
 - No shell execution from tool parameters.
 - No `child_process.exec` with untrusted input.
 - No `child_process.spawn` with string command injection.

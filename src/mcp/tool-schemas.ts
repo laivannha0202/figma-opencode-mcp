@@ -15,7 +15,13 @@ export const PingSchema = z.object({}).optional();
 
 export const GetSelectionSchema = z.object({
   includeChildren: z.boolean().optional().describe("Include children recursively"),
-  maxDepth: z.number().int().min(1).max(10).optional().describe("Max depth for children (default: 3)"),
+  maxDepth: z
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .optional()
+    .describe("Max depth for children (default: 3)"),
 });
 
 // ─── figma_get_current_page ────────────────────────────────────────────

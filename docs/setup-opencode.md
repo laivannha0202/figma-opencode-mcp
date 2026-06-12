@@ -51,12 +51,14 @@ If you cloned to `/home/user/projects/figma-opencode-mcp`:
 ## Verify
 
 1. Start the MCP server:
+
    ```bash
    cd figma-opencode-mcp
    npm run dev
    ```
 
 2. In another terminal, verify OpenCode can see the MCP server:
+
    ```bash
    opencode mcp list
    ```

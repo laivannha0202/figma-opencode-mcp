@@ -94,20 +94,14 @@ export class WsBridgeServer {
 
       this._httpServer.on("error", (err: NodeJS.ErrnoException) => {
         if (err.code === "EADDRINUSE") {
-          reject(
-            new Error(
-              `Port ${this._port} is already in use. Is another instance running?`,
-            ),
-          );
+          reject(new Error(`Port ${this._port} is already in use. Is another instance running?`));
         } else {
           reject(err);
         }
       });
 
       this._httpServer.listen(this._port, this._host, () => {
-        logger.info(
-          `Bridge WS server listening on ws://${this._host}:${this._port}`,
-        );
+        logger.info(`Bridge WS server listening on ws://${this._host}:${this._port}`);
         resolve();
       });
     });
@@ -177,9 +171,7 @@ export class WsBridgeServer {
         parsed = JSON.parse(raw.toString());
       } catch {
         logger.warn("Invalid JSON from plugin");
-        ws.send(
-          JSON.stringify({ type: "error", message: "Invalid JSON" }),
-        );
+        ws.send(JSON.stringify({ type: "error", message: "Invalid JSON" }));
         return;
       }
 

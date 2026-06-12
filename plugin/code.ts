@@ -92,10 +92,7 @@ figma.ui.onmessage = async (msg: BridgeRequest) => {
 
 // ─── Tool dispatch ──────────────────────────────────────────────────────
 
-async function handleToolRequest(
-  tool: string,
-  params: unknown,
-): Promise<unknown> {
+async function handleToolRequest(tool: string, params: unknown): Promise<unknown> {
   switch (tool) {
     case "figma_ping":
       return handlePing();
@@ -132,22 +129,20 @@ function serializeNode(
     _depth?: number;
   } = {},
 ): SerializedNode | null {
-  const {
-    maxDepth = 5,
-    includeInvisible = false,
-    includeChildren = true,
-    _depth = 0,
-  } = options;
+  const { maxDepth = 5, includeInvisible = false, includeChildren = true, _depth = 0 } = options;
 
   if (_depth > maxDepth) return null;
-  if (!includeInvisible && !node.visible) return null;
+
+  // PageNode/BaseNode may not have visible — treat as visible if absent
+  const nodeVisible = "visible" in node ? node.visible : true;
+  if (!includeInvisible && !nodeVisible) return null;
 
   const base: SceneNode = node;
   const result: SerializedNode = {
     id: base.id,
     name: base.name,
     type: base.type,
-    visible: base.visible,
+    visible: nodeVisible,
   };
 
   // Locked (not all nodes have it)
@@ -190,16 +185,25 @@ function serializeNode(
     result.layoutMode = (base as unknown as Record<string, string>).layoutMode;
   }
   if ("primaryAxisSizingMode" in base) {
-    result.primaryAxisSizingMode = (base as unknown as Record<string, string>).primaryAxisSizingMode;
+    result.primaryAxisSizingMode = (
+      base as unknown as Record<string, string>
+    ).primaryAxisSizingMode;
   }
   if ("counterAxisSizingMode" in base) {
-    result.counterAxisSizingMode = (base as unknown as Record<string, string>).counterAxisSizingMode;
+    result.counterAxisSizingMode = (
+      base as unknown as Record<string, string>
+    ).counterAxisSizingMode;
   }
-  if ("itemSpacing" in base) result.itemSpacing = (base as unknown as Record<string, number>).itemSpacing;
-  if ("paddingLeft" in base) result.paddingLeft = (base as unknown as Record<string, number>).paddingLeft;
-  if ("paddingRight" in base) result.paddingRight = (base as unknown as Record<string, number>).paddingRight;
-  if ("paddingTop" in base) result.paddingTop = (base as unknown as Record<string, number>).paddingTop;
-  if ("paddingBottom" in base) result.paddingBottom = (base as unknown as Record<string, number>).paddingBottom;
+  if ("itemSpacing" in base)
+    result.itemSpacing = (base as unknown as Record<string, number>).itemSpacing;
+  if ("paddingLeft" in base)
+    result.paddingLeft = (base as unknown as Record<string, number>).paddingLeft;
+  if ("paddingRight" in base)
+    result.paddingRight = (base as unknown as Record<string, number>).paddingRight;
+  if ("paddingTop" in base)
+    result.paddingTop = (base as unknown as Record<string, number>).paddingTop;
+  if ("paddingBottom" in base)
+    result.paddingBottom = (base as unknown as Record<string, number>).paddingBottom;
 
   // Constraints
   if ("constraints" in base) {
@@ -272,7 +276,7 @@ function handlePing() {
   const fileKey = (figma as unknown as Record<string, unknown>).fileKey;
   return {
     plugin: "figma-opencode-mcp-plugin",
-    version: "0.1.0",
+    version: "0.1.1",
     figma: {
       editorType: figma.editorType,
       fileKey: fileKey ?? null,
@@ -293,9 +297,7 @@ function handleGetSelection(params: Record<string, unknown>) {
   const includeChildren = params.includeChildren === true;
   const maxDepth = typeof params.maxDepth === "number" ? params.maxDepth : 3;
 
-  const nodes = selection.map((node) =>
-    serializeNode(node, { maxDepth, includeChildren }),
-  );
+  const nodes = selection.map((node) => serializeNode(node, { maxDepth, includeChildren }));
 
   return { selection: nodes, count: nodes.length };
 }
@@ -373,8 +375,7 @@ function handleExportSelectionJson(params: Record<string, unknown>) {
       };
 
       if (typeof frame.layoutPositioning !== "undefined") {
-        (detailed.layout as Record<string, unknown>).layoutPositioning =
-          frame.layoutPositioning;
+        (detailed.layout as Record<string, unknown>).layoutPositioning = frame.layoutPositioning;
       }
     }
 
@@ -431,9 +432,7 @@ async function handleCreateFrame(params: Record<string, unknown>): Promise<unkno
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
-    frame.fills = [
-      { type: "SOLID", color: { r, g, b }, opacity: 1 },
-    ];
+    frame.fills = [{ type: "SOLID", color: { r, g, b }, opacity: 1 }];
   } else {
     // Default: no fill (transparent)
     frame.fills = [];
@@ -464,23 +463,30 @@ async function handleCreateText(params: Record<string, unknown>): Promise<unknow
   const fontSize = (params.fontSize as number) ?? 16;
   const fill = params.fill as string | undefined;
 
-  // Load font first
-  try {
-    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  } catch {
-    // Fallback to any available font
+  // Load font with fallback chain; track which one succeeded
+  let loadedFontName: { family: string; style: string } | null = null;
+
+  const FONT_CANDIDATES: { family: string; style: string }[] = [
+    { family: "Inter", style: "Regular" },
+    { family: "Roboto", style: "Regular" },
+    { family: "Arial", style: "Regular" },
+  ];
+
+  for (const candidate of FONT_CANDIDATES) {
     try {
-      await figma.loadFontAsync({ family: "Roboto", style: "Regular" });
+      await figma.loadFontAsync(candidate);
+      loadedFontName = candidate;
+      break;
     } catch {
-      try {
-        await figma.loadFontAsync({ family: "Arial", style: "Regular" });
-      } catch {
-        throw new Error(
-          "Could not load any default font (Inter, Roboto, Arial). " +
-          "Please ensure at least one of these fonts is available in Figma.",
-        );
-      }
+      // Try next candidate
     }
+  }
+
+  if (!loadedFontName) {
+    throw new Error(
+      "Could not load any default font (Inter, Roboto, Arial). " +
+        "Please ensure at least one of these fonts is available in Figma.",
+    );
   }
 
   const textNode = figma.createText();
@@ -489,15 +495,16 @@ async function handleCreateText(params: Record<string, unknown>): Promise<unknow
   textNode.y = y;
   textNode.fontSize = fontSize;
 
+  // Set the loaded font on the text node before setting characters
+  textNode.fontName = loadedFontName;
+
   // Set fill if provided
   if (fill) {
     const hex = fill.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
-    textNode.fills = [
-      { type: "SOLID", color: { r, g, b }, opacity: 1 },
-    ];
+    textNode.fills = [{ type: "SOLID", color: { r, g, b }, opacity: 1 }];
   }
 
   textNode.characters = text;
@@ -551,7 +558,11 @@ function handleAuditSelection(params: Record<string, unknown>): unknown {
     // Auto-layout check
     if (checkAutoLayout && "children" in node) {
       const container = node as unknown as { children: SceneNode[] };
-      if (container.children.length > 1 && (!("layoutMode" in node) || (node as unknown as Record<string, unknown>).layoutMode === "NONE")) {
+      if (
+        container.children.length > 1 &&
+        (!("layoutMode" in node) ||
+          (node as unknown as Record<string, unknown>).layoutMode === "NONE")
+      ) {
         issues.push({
           severity: "warning",
           category: "layout",

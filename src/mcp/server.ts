@@ -12,10 +12,7 @@ import { z } from "zod";
 import { rootLogger } from "../shared/logger.js";
 import { SERVER_NAME, SERVER_VERSION, SUPPORTED_TOOLS } from "../shared/protocol.js";
 import { TOOL_DESCRIPTORS } from "./tools.js";
-import {
-  ALL_TOOL_SCHEMAS,
-  type ToolSchemaMap,
-} from "./tool-schemas.js";
+import { ALL_TOOL_SCHEMAS, type ToolSchemaMap } from "./tool-schemas.js";
 import { createHandlers, type HandlerContext } from "./tool-handlers.js";
 import type { BridgeClient } from "../bridge/bridge-client.js";
 import { McpError } from "../shared/errors.js";
@@ -109,21 +106,24 @@ export class FigmaMcpServer {
     // so the tool takes no arguments
     const isNoParams =
       schema instanceof z.ZodOptional ||
-      (schema instanceof z.ZodObject &&
-        Object.keys(schema.shape).length === 0);
+      (schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0);
 
     if (isNoParams) {
-      this._mcpServer.registerTool(name, {
-        description,
-        inputSchema: undefined,
-      }, async () => {
-        try {
-          const result = await handler(undefined);
-          return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-        } catch (err) {
-          return _formatError(err);
-        }
-      });
+      this._mcpServer.registerTool(
+        name,
+        {
+          description,
+          inputSchema: undefined,
+        },
+        async () => {
+          try {
+            const result = await handler(undefined);
+            return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+          } catch (err) {
+            return _formatError(err);
+          }
+        },
+      );
     } else {
       // For tools with params, pass the raw shape object
       const shape = schema instanceof z.ZodObject ? schema.shape : {};
@@ -170,11 +170,7 @@ function _formatError(err: unknown): {
     content: [
       {
         type: "text",
-        text: JSON.stringify(
-          { code: "UNKNOWN_ERROR", message, details: undefined },
-          null,
-          2,
-        ),
+        text: JSON.stringify({ code: "UNKNOWN_ERROR", message, details: undefined }, null, 2),
       },
     ],
     isError: true,

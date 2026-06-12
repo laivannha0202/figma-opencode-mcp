@@ -11,13 +11,32 @@
  */
 
 import { rootLogger as logger } from "./shared/logger.js";
-import {
-  DEFAULT_BRIDGE_HOST,
-  DEFAULT_BRIDGE_PORT,
-} from "./shared/protocol.js";
+import { DEFAULT_BRIDGE_HOST, DEFAULT_BRIDGE_PORT } from "./shared/protocol.js";
 import { WsBridgeServer } from "./bridge/ws-server.js";
 import { BridgeClient } from "./bridge/bridge-client.js";
 import { FigmaMcpServer } from "./mcp/server.js";
+
+// ─── Allowed bridge hosts (strict localhost only) ─────────────────────
+
+const ALLOWED_BRIDGE_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
+
+const LAN_IP_PATTERNS = [
+  /^0\.0\.0\.0$/,
+  /^10\./, // 10.x.x.x
+  /^172\.(1[6-9]|2\d|3[01])\./, // 172.16-31.x.x
+  /^192\.168\./, // 192.168.x.x
+  /^100\.([6-9]\d|1[0-2]\d)\./, // Carrier-grade NAT 100.64-127.x.x
+];
+
+function isHostAllowed(host: string): boolean {
+  if (ALLOWED_BRIDGE_HOSTS.has(host)) return true;
+  for (const pattern of LAN_IP_PATTERNS) {
+    if (pattern.test(host)) return false;
+  }
+  // Reject any numeric IP that isn't 127.0.0.1, localhost, or ::1
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) return false;
+  return ALLOWED_BRIDGE_HOSTS.has(host);
+}
 
 // ─── Config ─────────────────────────────────────────────────────────────
 
@@ -27,8 +46,19 @@ interface Config {
 }
 
 function loadConfig(): Config {
+  const host = process.env.FIGMA_BRIDGE_HOST ?? DEFAULT_BRIDGE_HOST;
+
+  if (!isHostAllowed(host)) {
+    console.error(
+      `[figma-opencode-mcp] FATAL: Bridge host "${host}" is not allowed. ` +
+        `Only 127.0.0.1, localhost, and ::1 are permitted for security. ` +
+        `FIGMA_BRIDGE_HOST cannot be set to 0.0.0.0 or any LAN IP.`,
+    );
+    process.exit(1);
+  }
+
   return {
-    bridgeHost: process.env.FIGMA_BRIDGE_HOST ?? DEFAULT_BRIDGE_HOST,
+    bridgeHost: host,
     bridgePort: Number(process.env.FIGMA_BRIDGE_PORT) || DEFAULT_BRIDGE_PORT,
   };
 }
@@ -38,7 +68,7 @@ function loadConfig(): Config {
 async function main(): Promise<void> {
   const config = loadConfig();
 
-  logger.info(`Starting figma-opencode-mcp v0.1.0...`);
+  logger.info(`Starting figma-opencode-mcp v0.1.1...`);
   logger.info(`Bridge config: ws://${config.bridgeHost}:${config.bridgePort}`);
 
   // 1. Start WebSocket bridge server
@@ -57,9 +87,7 @@ async function main(): Promise<void> {
   await mcpServer.start();
 
   logger.info("figma-opencode-mcp is ready");
-  logger.info(
-    "Open Figma → run the plugin → call figma_ping from OpenCode/Codex",
-  );
+  logger.info("Open Figma → run the plugin → call figma_ping from OpenCode/Codex");
 
   // ─── Graceful shutdown ──────────────────────────────────────────────
 

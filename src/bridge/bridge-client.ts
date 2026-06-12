@@ -52,20 +52,13 @@ export class BridgeClient {
    * @returns the result from the plugin
    * @throws McpError if plugin is not connected, request times out, or plugin returns error
    */
-  async request(
-    tool: string,
-    params: unknown,
-    timeoutMs?: number,
-  ): Promise<unknown> {
+  async request(tool: string, params: unknown, timeoutMs?: number): Promise<unknown> {
     if (!this._server.pluginConnected) {
       throw pluginNotConnectedError();
     }
 
     const timeout = timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
-    const { requestId, promise } = this._server.pendingRequests.register(
-      tool,
-      timeout,
-    );
+    const { requestId, promise } = this._server.pendingRequests.register(tool, timeout);
 
     const request: BridgeRequest = {
       type: "request",

@@ -36,7 +36,7 @@ export interface BridgeError {
 export interface BridgeHello {
   type: "hello";
   plugin: "figma-opencode-mcp-plugin";
-  version: "0.1.0";
+  version: "0.1.1";
   figma?: {
     editorType?: string;
     fileName?: string;
@@ -53,10 +53,7 @@ export interface BridgeDisconnect {
 
 // ─── Union type for messages from Plugin → MCP Server ───────────────────
 
-export type BridgeIncomingMessage =
-  | BridgeResponse
-  | BridgeHello
-  | BridgeDisconnect;
+export type BridgeIncomingMessage = BridgeResponse | BridgeHello | BridgeDisconnect;
 
 // ─── Union type for messages from MCP Server → Plugin ───────────────────
 
@@ -64,9 +61,7 @@ export type BridgeOutgoingMessage = BridgeRequest;
 
 // ─── Utility: validate incoming message shape ───────────────────────────
 
-export function isBridgeIncomingMessage(
-  data: unknown,
-): data is BridgeIncomingMessage {
+export function isBridgeIncomingMessage(data: unknown): data is BridgeIncomingMessage {
   if (typeof data !== "object" || data === null) return false;
   const msg = data as Record<string, unknown>;
   if (msg.type === "response") {
@@ -100,4 +95,4 @@ export const DEFAULT_BRIDGE_HOST = "127.0.0.1";
 export const DEFAULT_BRIDGE_PORT = 3845;
 export const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
 export const SERVER_NAME = "figma-opencode-mcp";
-export const SERVER_VERSION = "0.1.0";
+export const SERVER_VERSION = "0.1.1";

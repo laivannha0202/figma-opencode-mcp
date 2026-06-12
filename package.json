@@ -1,6 +1,6 @@
 {
   "name": "figma-opencode-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local-first MCP server for OpenCode/Codex that connects AI coding agents to the currently open Figma file through a local plugin bridge",
   "type": "module",
   "main": "dist/index.js",
@@ -9,7 +9,9 @@
     "build": "tsc -p tsconfig.json",
     "build:plugin": "tsc -p plugin/tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "verify": "npm run typecheck && npm run build && npm run build:plugin"
+    "verify": "npm run typecheck && npm run build && npm run build:plugin",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml}\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -20,6 +22,7 @@
     "@figma/plugin-typings": "^1.128.0",
     "@types/node": "^22.0.0",
     "@types/ws": "^8.18.0",
+    "prettier": "^3.5.0",
     "tsx": "^4.22.4",
     "typescript": "^5.8.0"
   },

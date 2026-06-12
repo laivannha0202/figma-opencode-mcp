@@ -15,9 +15,7 @@ const logger = rootLogger;
 
 // ─── Handler helper types ──────────────────────────────────────────────
 
-export type ToolHandler = (
-  params: Record<string, unknown> | undefined,
-) => Promise<unknown>;
+export type ToolHandler = (params: Record<string, unknown> | undefined) => Promise<unknown>;
 
 export interface HandlerContext {
   bridgeClient: BridgeClient;
@@ -64,10 +62,7 @@ async function handleGetCurrentPage(
 
 // ─── figma_get_node_tree ────────────────────────────────────────────────
 
-async function handleGetNodeTree(
-  ctx: HandlerContext,
-  params: Record<string, unknown> | undefined,
-) {
+async function handleGetNodeTree(ctx: HandlerContext, params: Record<string, unknown> | undefined) {
   const result = await ctx.bridgeClient.request("figma_get_node_tree", params ?? {});
   return result;
 }
@@ -84,20 +79,14 @@ async function handleExportSelectionJson(
 
 // ─── figma_create_frame ─────────────────────────────────────────────────
 
-async function handleCreateFrame(
-  ctx: HandlerContext,
-  params: Record<string, unknown>,
-) {
+async function handleCreateFrame(ctx: HandlerContext, params: Record<string, unknown>) {
   const result = await ctx.bridgeClient.request("figma_create_frame", params);
   return result;
 }
 
 // ─── figma_create_text ──────────────────────────────────────────────────
 
-async function handleCreateText(
-  ctx: HandlerContext,
-  params: Record<string, unknown>,
-) {
+async function handleCreateText(ctx: HandlerContext, params: Record<string, unknown>) {
   const result = await ctx.bridgeClient.request("figma_create_text", params);
   return result;
 }
