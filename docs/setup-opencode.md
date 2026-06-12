@@ -1,13 +1,25 @@
 # Setup for OpenCode
 
-## Prerequisites
+## Recommended: Install with npx
+
+Run the MCP server directly without cloning the repo:
+
+```bash
+opencode mcp add figma-opencode-mcp -- npx -y figma-opencode-mcp@latest
+```
+
+This adds the MCP server to your OpenCode configuration automatically.
+
+## Alternative: Local clone
+
+### Prerequisites
 
 - Node.js >= 18
 - npm
 - Figma desktop app
 - OpenCode CLI
 
-## Install & Build
+### Install & Build
 
 ```bash
 git clone <repo-url> figma-opencode-mcp
@@ -16,7 +28,7 @@ npm install
 npm run build
 ```
 
-## Configure OpenCode MCP
+### Configure OpenCode MCP
 
 Add the following to your OpenCode configuration file (typically `~/.config/opencode/opencode.json` or project-level `opencode.json`):
 
@@ -53,8 +65,11 @@ If you cloned to `/home/user/projects/figma-opencode-mcp`:
 1. Start the MCP server:
 
    ```bash
-   cd figma-opencode-mcp
-   npm run dev
+   # If using npx:
+   npx -y figma-opencode-mcp@latest
+
+   # If using local clone:
+   cd figma-opencode-mcp && npm run dev
    ```
 
 2. In another terminal, verify OpenCode can see the MCP server:
@@ -71,5 +86,5 @@ If you cloned to `/home/user/projects/figma-opencode-mcp`:
 ## Troubleshooting
 
 - **MCP server not showing up**: Check your config path is absolute and points to `dist/index.js` (not `src/index.ts`).
-- **Connection refused**: Ensure `npm run dev` is running before starting OpenCode.
+- **Connection refused**: Ensure the MCP server is running before starting OpenCode.
 - **Plugin not connected**: Open Figma, run the plugin manually. The plugin auto-connects to `ws://127.0.0.1:3845`.

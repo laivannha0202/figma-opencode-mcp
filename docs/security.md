@@ -41,6 +41,9 @@
 - No shell execution from tool parameters.
 - No `child_process.exec` with untrusted input.
 - No `child_process.spawn` with string command injection.
+- npm package `files` field in `package.json` limits published contents to only required directories (`dist`, `plugin`, `docs`, `examples`, `README.md`, `LICENSE`).
+- Source TypeScript files (`src/`) are excluded from the npm package to reduce supply-chain surface.
+- `prepack` script runs `build` and `build:plugin` to ensure the package contains only compiled artifacts.
 
 ## Future: Advanced / API Mode
 

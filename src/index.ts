@@ -6,15 +6,71 @@
  * Starts the WebSocket bridge server for Figma plugin communication,
  * then starts the MCP stdio server for OpenCode/Codex integration.
  *
+ * Supports --version and --help flags.
  * All debug/info/warn/error output goes to stderr. stdout is reserved
  * exclusively for MCP JSON-RPC messages.
  */
 
 import { rootLogger as logger } from "./shared/logger.js";
-import { DEFAULT_BRIDGE_HOST, DEFAULT_BRIDGE_PORT } from "./shared/protocol.js";
+import {
+  DEFAULT_BRIDGE_HOST,
+  DEFAULT_BRIDGE_PORT,
+  SERVER_NAME,
+  SERVER_VERSION,
+} from "./shared/protocol.js";
 import { WsBridgeServer } from "./bridge/ws-server.js";
 import { BridgeClient } from "./bridge/bridge-client.js";
 import { FigmaMcpServer } from "./mcp/server.js";
+
+// ─── CLI flags ──────────────────────────────────────────────────────────
+
+function printVersion(): void {
+  console.error(`${SERVER_NAME} v${SERVER_VERSION}`);
+}
+
+function printHelp(): void {
+  console.error(`${SERVER_NAME} v${SERVER_VERSION}`);
+  console.error("");
+  console.error("Local-first MCP server for OpenCode/Codex that connects AI coding");
+  console.error("agents to the currently open Figma file through a local plugin bridge.");
+  console.error("");
+  console.error("Usage:");
+  console.error("  figma-opencode-mcp            Start MCP stdio server (default)");
+  console.error("  figma-opencode-mcp --version   Print version and exit");
+  console.error("  figma-opencode-mcp --help      Print this help and exit");
+  console.error("");
+  console.error("Options:");
+  console.error("  --version    Show version number");
+  console.error("  --help       Show this help message");
+  console.error("");
+  console.error("Environment variables:");
+  console.error("  FIGMA_BRIDGE_HOST    WebSocket bridge host (default: 127.0.0.1)");
+  console.error("  FIGMA_BRIDGE_PORT    WebSocket bridge port (default: 3845)");
+  console.error("");
+  console.error("What it does:");
+  console.error("  - starts MCP stdio server for AI agent integration");
+  console.error("  - starts local WebSocket bridge on 127.0.0.1:3845");
+  console.error("  - no Figma API token required in default mode");
+  console.error("  - no Figma REST API used in default mode");
+  console.error("");
+  console.error("Plugin setup:");
+  console.error("  1. Build the plugin: npm run build:plugin");
+  console.error("  2. In Figma: Plugins → Development → Import plugin from manifest");
+  console.error("  3. Select plugin/manifest.json");
+  console.error("  4. Run the plugin in your Figma file");
+  console.error("");
+  console.error("Docs: https://github.com/opencode-ai/figma-opencode-mcp");
+}
+
+const args = process.argv.slice(2);
+if (args.includes("--version") || args.includes("-v")) {
+  printVersion();
+  process.exit(0);
+}
+if (args.includes("--help") || args.includes("-h")) {
+  printHelp();
+  process.exit(0);
+}
 
 // ─── Allowed bridge hosts (strict localhost only) ─────────────────────
 
@@ -68,7 +124,7 @@ function loadConfig(): Config {
 async function main(): Promise<void> {
   const config = loadConfig();
 
-  logger.info(`Starting figma-opencode-mcp v0.1.1...`);
+  logger.info(`Starting ${SERVER_NAME} v${SERVER_VERSION}...`);
   logger.info(`Bridge config: ws://${config.bridgeHost}:${config.bridgePort}`);
 
   // 1. Start WebSocket bridge server

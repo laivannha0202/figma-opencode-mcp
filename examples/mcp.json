@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "figma-opencode-mcp": {
-      "command": "node",
-      "args": ["./dist/index.js"]
+      "command": "npx",
+      "args": ["-y", "figma-opencode-mcp@latest"]
     }
   }
 }

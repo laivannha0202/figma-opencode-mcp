@@ -276,7 +276,7 @@ function handlePing() {
   const fileKey = (figma as unknown as Record<string, unknown>).fileKey;
   return {
     plugin: "figma-opencode-mcp-plugin",
-    version: "0.1.1",
+    version: "0.2.0",
     figma: {
       editorType: figma.editorType,
       fileKey: fileKey ?? null,

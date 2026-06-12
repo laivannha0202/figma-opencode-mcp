@@ -34,3 +34,6 @@ jobs:
 
       - name: Verify
         run: bash scripts/verify.sh
+
+      - name: NPM pack dry-run
+        run: npm run pack:dry

@@ -78,6 +78,34 @@ else
   echo "❌ $MISSING file(s) missing"
 fi
 
+# 5. Verify npm package integrity (dry-run)
+echo "--- NPM pack dry-run ---"
+if ! npm pack --dry-run 2>&1; then
+  echo "❌ npm pack --dry-run failed"
+  FAILED=1
+fi
+echo ""
+
+# 6. Check that dist/index.js has shebang
+echo "--- Shebang check ---"
+if head -1 dist/index.js | grep -q '^#!/usr/bin/env node'; then
+  echo "✅ dist/index.js has shebang"
+else
+  echo "❌ dist/index.js missing shebang"
+  FAILED=1
+fi
+echo ""
+
+# 7. Check that package.json has bin and files
+echo "--- Package integrity ---"
+if grep -q '"bin"' package.json && grep -q '"files"' package.json; then
+  echo "✅ package.json has bin and files fields"
+else
+  echo "❌ package.json missing bin or files field"
+  FAILED=1
+fi
+echo ""
+
 echo ""
 if [ "$FAILED" -eq 0 ]; then
   echo "=== Verify passed ==="

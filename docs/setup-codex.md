@@ -1,13 +1,25 @@
 # Setup for Codex CLI
 
-## Prerequisites
+## Recommended: Install with npx
+
+Run the MCP server directly without cloning the repo:
+
+```bash
+codex mcp add figma-opencode-mcp -- npx -y figma-opencode-mcp@latest
+```
+
+This adds the MCP server to your Codex configuration automatically.
+
+## Alternative: Local clone
+
+### Prerequisites
 
 - Node.js >= 18
 - npm
 - Figma desktop app
 - Codex CLI
 
-## Install & Build
+### Install & Build
 
 ```bash
 git clone <repo-url> figma-opencode-mcp
@@ -16,7 +28,7 @@ npm install
 npm run build
 ```
 
-## Configure Codex MCP
+### Configure Codex MCP
 
 Codex CLI supports MCP via its configuration mechanism. Add the following to your Codex MCP config file:
 
@@ -53,8 +65,11 @@ If you cloned to `/Users/me/projects/figma-opencode-mcp`:
 1. Start the MCP server:
 
    ```bash
-   cd figma-opencode-mcp
-   npm run dev
+   # If using npx:
+   npx -y figma-opencode-mcp@latest
+
+   # If using local clone:
+   cd figma-opencode-mcp && npm run dev
    ```
 
 2. In a Codex session, try:

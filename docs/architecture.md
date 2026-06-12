@@ -74,6 +74,6 @@ Since the plugin main code cannot make network connections, the UI must handle t
 
 - The MCP server **cannot access arbitrary Figma files**. It can only read/write the file that is currently open in Figma with the bridge plugin running.
 - The plugin must be manually launched in the Figma file.
-- Only one plugin connection is supported at a time in v0.1.0.
+- Only one plugin connection is supported at a time in v0.2.0.
 - Performance depends on Figma file complexity and selection size.
 - The bridge adds ~1-15ms latency per request (WebSocket localhost).

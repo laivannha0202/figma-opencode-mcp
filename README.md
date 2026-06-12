@@ -4,7 +4,7 @@
 
 > No Figma API token required. No Figma REST API in default mode. All communication stays on your machine.
 
-**Version: v0.1.1** — Hardening release. Improved security, verify script, font handling, and CI.
+**Version: v0.2.0** — npm packaging release. Run with a single `npx` command.
 
 ## Key Features
 
@@ -15,7 +15,7 @@
 - ✏️ **Create frames and text** — basic write operations
 - 🔍 **Audit selection** — design system heuristics (spacing, typography, layout)
 - 🧩 **Works with OpenCode and Codex** via MCP stdio transport
-- 📦 **Ready for `opencode-power-kit` integration**
+- 📦 **Run with a single `npx` command** — no clone or install needed
 
 ## Important Limitations
 
@@ -35,7 +35,45 @@ See [docs/architecture.md](docs/architecture.md) for details.
 
 ## Quick Start
 
-### 1. Install & Build
+### Option A: Install with npx (recommended)
+
+Run the MCP server directly — no clone or local build needed:
+
+```bash
+npx -y figma-opencode-mcp@latest
+```
+
+#### Configure OpenCode/Codex
+
+**OpenCode:**
+
+```bash
+opencode mcp add figma-opencode-mcp -- npx -y figma-opencode-mcp@latest
+```
+
+**Codex:**
+
+```bash
+codex mcp add figma-opencode-mcp -- npx -y figma-opencode-mcp@latest
+```
+
+**.mcp.json (any MCP client):**
+
+```json
+{
+  "mcpServers": {
+    "figma-opencode-mcp": {
+      "command": "npx",
+      "args": ["-y", "figma-opencode-mcp@latest"]
+    }
+  }
+}
+```
+
+> **Note:** The npm/npx command only installs the MCP server.
+> You still need to import and run the Figma plugin separately (see step 4).
+
+### Option B: Local clone (for development)
 
 ```bash
 git clone <repo-url> figma-opencode-mcp
@@ -44,7 +82,7 @@ npm install
 npm run build
 ```
 
-### 2. Start MCP Server
+**Start MCP Server:**
 
 ```bash
 # Development mode (hot reload)
@@ -54,14 +92,7 @@ npm run dev
 node dist/index.js
 ```
 
-### 3. Configure OpenCode/Codex
-
-Add the MCP config to your tool. See:
-
-- [OpenCode setup](docs/setup-opencode.md)
-- [Codex setup](docs/setup-codex.md)
-
-Example config:
+**Local MCP config:**
 
 ```json
 {
@@ -74,9 +105,9 @@ Example config:
 }
 ```
 
-### 4. Run Figma Plugin
+### 4. Run Figma Plugin (required for both options)
 
-1. Build the plugin: `npm run build:plugin`
+1. Build the plugin: `npm run build:plugin` (skip if using npx — download the plugin from [releases](https://github.com/opencode-ai/figma-opencode-mcp/releases))
 2. In Figma: **Plugins → Development → Import plugin from manifest**
 3. Select `plugin/manifest.json`
 4. Run the plugin in your Figma file
@@ -135,7 +166,14 @@ See [docs/security.md](docs/security.md).
 
 ## Roadmap
 
-### v0.2.0
+### v0.2.0 ✅
+
+- npm package packaging with `npx` support
+- `--version` and `--help` CLI flags
+- Plugin packaging (`plugin.zip`)
+- Documentation updates for npx install
+
+### v0.3.0
 
 - `figma_extract_design_tokens`
 - `figma_generate_react_spec`
@@ -144,7 +182,7 @@ See [docs/security.md](docs/security.md).
 - `figma_apply_auto_layout`
 - `figma_export_svg_png`
 
-### v0.3.0
+### v0.4.0
 
 - Integration profile for `opencode-power-kit`
 - `/figma-setup` slash command
@@ -157,7 +195,6 @@ See [docs/security.md](docs/security.md).
 - Stable no-token local bridge
 - Better plugin session management
 - Better schema docs
-- npm package publish
 
 ## License
 
