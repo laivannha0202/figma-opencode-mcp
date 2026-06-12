@@ -1,0 +1,14 @@
+{
+  "name": "Figma OpenCode MCP Bridge",
+  "id": "figma-opencode-mcp-bridge",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "ui.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": ["figma", "figjam"],
+  "networkAccess": {
+    "allowedDomains": ["ws://127.0.0.1"],
+    "reasoning": "Local WebSocket connection to MCP bridge server on localhost only."
+  }
+}

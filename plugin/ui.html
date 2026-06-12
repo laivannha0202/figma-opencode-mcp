@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Figma OpenCode MCP Bridge</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #333;
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      background: #444;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #7c7cff;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .status-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #2a2a2a;
+      border-radius: 6px;
+    }
+
+    .status-label {
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .status-value {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .connected {
+      color: #4caf50;
+    }
+
+    .disconnected {
+      color: #f44336;
+    }
+
+    .info {
+      color: #7c7cff;
+    }
+
+    .log-area {
+      background: #111;
+      border-radius: 6px;
+      padding: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 11px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .log-entry.error {
+      color: #f44336;
+    }
+
+    .log-entry.ok {
+      color: #4caf50;
+    }
+
+    .log-entry.info {
+      color: #7c7cff;
+    }
+
+    .footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #333;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    }
+
+    button {
+      background: #333;
+      border: 1px solid #555;
+      color: #e0e0e0;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">F</div>
+    <div>
+      <div class="title">OpenCode MCP Bridge</div>
+      <div class="subtitle">v0.1.0 — Local Plugin Bridge</div>
+    </div>
+  </div>
+
+  <div class="status-grid">
+    <div class="status-item">
+      <span class="status-label">WebSocket</span>
+      <span class="status-value disconnected" id="ws-status">Disconnected</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Bridge</span>
+      <span class="status-value" id="bridge-status">ws://127.0.0.1:3845</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">File</span>
+      <span class="status-value" id="file-status">—</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Page</span>
+      <span class="status-value" id="page-status">—</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 8px; display: flex; gap: 8px;">
+    <button id="connect-btn" onclick="manualConnect()">Connect</button>
+    <button id="disconnect-btn" class="hidden" onclick="manualDisconnect()">Disconnect</button>
+  </div>
+
+  <div class="log-area" id="log-area">
+    <div class="log-entry info">Ready to connect...</div>
+  </div>
+
+  <div class="footer">
+    figma-opencode-mcp v0.1.0
+  </div>
+
+  <script>
+    // ─── WebSocket management ──────────────────────────────────────────
+
+    let ws = null;
+    let reconnectTimer = null;
+    let isManualDisconnect = false;
+
+    const WS_URL = 'ws://127.0.0.1:3845';
+
+    function log(message, type = 'info') {
+      const area = document.getElementById('log-area');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      entry.textContent = time + ' ' + message;
+      area.appendChild(entry);
+      area.scrollTop = area.scrollHeight;
+
+      // Keep last 50 entries
+      while (area.children.length > 50) {
+        area.removeChild(area.firstChild);
+      }
+    }
+
+    function updateStatus(connected) {
+      const el = document.getElementById('ws-status');
+      el.textContent = connected ? 'Connected' : 'Disconnected';
+      el.className = 'status-value ' + (connected ? 'connected' : 'disconnected');
+
+      document.getElementById('connect-btn').className = connected ? 'hidden' : '';
+      document.getElementById('disconnect-btn').className = connected ? '' : 'hidden';
+    }
+
+    function connectWebSocket() {
+      if (ws && ws.readyState === WebSocket.OPEN) return;
+
+      isManualDisconnect = false;
+
+      try {
+        ws = new WebSocket(WS_URL);
+
+        ws.onopen = function() {
+          log('Connected to bridge at ' + WS_URL, 'ok');
+          updateStatus(true);
+
+          // Send hello
+          const hello = {
+            type: 'hello',
+            plugin: 'figma-opencode-mcp-plugin',
+            version: '0.1.0'
+          };
+          ws.send(JSON.stringify(hello));
+        };
+
+        ws.onmessage = function(event) {
+          try {
+            const msg = JSON.parse(event.data);
+
+            if (msg.type === 'request') {
+              // Forward to Figma plugin main code
+              parent.postMessage(
+                { pluginMessage: msg },
+                '*'
+              );
+              log('Request: ' + msg.tool, 'info');
+            }
+          } catch (e) {
+            log('Parse error: ' + e.message, 'error');
+          }
+        };
+
+        ws.onclose = function() {
+          updateStatus(false);
+          log('Disconnected from bridge', '');
+
+          // Auto-reconnect unless manual disconnect
+          if (!isManualDisconnect) {
+            reconnectTimer = setTimeout(function() {
+              log('Attempting reconnect...', 'info');
+              connectWebSocket();
+            }, 3000);
+          }
+        };
+
+        ws.onerror = function() {
+          log('WebSocket error', 'error');
+        };
+      } catch (e) {
+        log('Connection failed: ' + e.message, 'error');
+        updateStatus(false);
+
+        // Retry
+        reconnectTimer = setTimeout(function() {
+          log('Retrying...', 'info');
+          connectWebSocket();
+        }, 3000);
+      }
+    }
+
+    function manualConnect() {
+      clearTimeout(reconnectTimer);
+      connectWebSocket();
+    }
+
+    function manualDisconnect() {
+      isManualDisconnect = true;
+      clearTimeout(reconnectTimer);
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+      log('Manual disconnect', '');
+      updateStatus(false);
+    }
+
+    // ─── Listen for responses from plugin main ────────────────────────
+
+    window.onmessage = function(event) {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(msg));
+
+        if (msg.type === 'response') {
+          const status = msg.ok ? 'OK' : 'ERROR';
+          log('Response: ' + (msg.ok ? 'success' : 'failed'), msg.ok ? 'ok' : 'error');
+        }
+      }
+    };
+
+    // ─── Listen for file/page info from plugin main ───────────────────
+
+    // File info can be sent from main code or we can just skip for now
+    // The hello message already contains what we need.
+
+    // ─── Auto-connect on load ─────────────────────────────────────────
+
+    setTimeout(function() {
+      connectWebSocket();
+    }, 500);
+  </script>
+</body>
+</html>

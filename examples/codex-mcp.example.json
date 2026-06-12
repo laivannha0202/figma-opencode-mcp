@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "figma-opencode-mcp": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/figma-opencode-mcp/dist/index.js"]
+    }
+  }
+}
