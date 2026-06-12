@@ -1,13 +1,14 @@
 {
   "name": "figma-opencode-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Local-first MCP server for OpenCode/Codex that connects AI coding agents to the currently open Figma file through a local plugin bridge",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "figma-opencode-mcp": "./dist/index.js"
+    "figma-opencode-mcp": "bin/figma-opencode-mcp.js"
   },
   "files": [
+    "bin",
     "dist",
     "plugin",
     "docs",

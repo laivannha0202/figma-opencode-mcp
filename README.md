@@ -4,7 +4,7 @@
 
 > No Figma API token required. No Figma REST API in default mode. All communication stays on your machine.
 
-**Version: v0.2.0** — npm packaging release. Run with a single `npx` command.
+**Version: v0.2.1** — npm packaging fix. Run with a single `npx` command.
 
 ## Key Features
 
