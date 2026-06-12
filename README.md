@@ -4,7 +4,7 @@
 
 > No Figma API token required. No Figma REST API in default mode. All communication stays on your machine.
 
-**Version: v0.2.1** — npm packaging fix. Run with a single `npx` command.
+**Version: v0.2.2** — fix docs URL in CLI help. Run with a single `npx` command.
 
 ## Key Features
 
@@ -107,7 +107,7 @@ node dist/index.js
 
 ### 4. Run Figma Plugin (required for both options)
 
-1. Build the plugin: `npm run build:plugin` (skip if using npx — download the plugin from [releases](https://github.com/opencode-ai/figma-opencode-mcp/releases))
+1. Build the plugin: `npm run build:plugin` (skip if using npx — download the plugin from [releases](https://github.com/laivannha0202/figma-opencode-mcp/releases))
 2. In Figma: **Plugins → Development → Import plugin from manifest**
 3. Select `plugin/manifest.json`
 4. Run the plugin in your Figma file

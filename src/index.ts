@@ -59,7 +59,7 @@ function printHelp(): void {
   console.error("  3. Select plugin/manifest.json");
   console.error("  4. Run the plugin in your Figma file");
   console.error("");
-  console.error("Docs: https://github.com/opencode-ai/figma-opencode-mcp");
+  console.error("Docs: https://github.com/laivannha0202/figma-opencode-mcp");
 }
 
 const args = process.argv.slice(2);

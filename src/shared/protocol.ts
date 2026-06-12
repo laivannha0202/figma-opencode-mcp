@@ -36,7 +36,7 @@ export interface BridgeError {
 export interface BridgeHello {
   type: "hello";
   plugin: "figma-opencode-mcp-plugin";
-  version: "0.2.1";
+  version: "0.2.2";
   figma?: {
     editorType?: string;
     fileName?: string;
@@ -95,4 +95,4 @@ export const DEFAULT_BRIDGE_HOST = "127.0.0.1";
 export const DEFAULT_BRIDGE_PORT = 3845;
 export const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
 export const SERVER_NAME = "figma-opencode-mcp";
-export const SERVER_VERSION = "0.2.1";
+export const SERVER_VERSION = "0.2.2";
